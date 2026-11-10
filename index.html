@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radhika Super Mart - Supermarket Catalogue & Ordering</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom CSS Animations & Depth Styles -->
+    <style>
+        .card-hover-lift {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px -10px rgba(16, 185, 129, 0.22);
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+        .animated-pulse-glow {
+            animation: pulseGlow 3s infinite alternate ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0% { opacity: 0.4; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.08); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Header Navbar -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
+                    <div class="w-12 h-12 bg-gradient-to-tr from-emerald-600 to-teal-400 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-bold text-2xl">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Radhika</span>
+                        <span class="text-xs uppercase tracking-widest text-slate-400 block font-bold">Super Mart</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-8 font-semibold text-slate-600">
+                    <button onclick="showPage('home')" id="nav-home" class="hover:text-emerald-600 transition-colors py-1 border-b-2 border-emerald-600 text-emerald-600">Home</button>
+                    <button onclick="showPage('categories')" id="nav-categories" class="hover:text-emerald-600 transition-colors py-1 border-b-2 border-transparent">Categories</button>
+                    <button onclick="showPage('products')" id="nav-products" class="hover:text-emerald-600 transition-colors py-1 border-b-2 border-transparent">All Products</button>
+                    <button onclick="showPage('about')" id="nav-about" class="hover:text-emerald-600 transition-colors py-1 border-b-2 border-transparent">About Us</button>
+                    <button onclick="showPage('contact')" id="nav-contact" class="hover:text-emerald-600 transition-colors py-1 border-b-2 border-transparent">Contact Us</button>
+                </nav>
+
+                <!-- Search & Cart Header Actions -->
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <button onclick="openSearchModal()" class="p-2.5 rounded-full text-slate-500 hover:text-emerald-600 hover:bg-slate-100 transition-colors" title="Search Catalogue">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </button>
+
+                    <!-- Header Cart Button -->
+                    <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-full text-slate-700 hover:text-emerald-600 hover:bg-slate-100 transition-colors">
+                        <i class="fa-solid fa-cart-shopping text-xl"></i>
+                        <span id="nav-cart-badge" class="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white scale-0 transition-transform duration-200">0</span>
+                    </button>
+
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileNav()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-100 px-4 pt-2 pb-6 space-y-3">
+            <button onclick="showPage('home'); toggleMobileNav()" class="block w-full text-left py-2 font-medium text-slate-700 hover:text-emerald-600">Home</button>
+            <button onclick="showPage('categories'); toggleMobileNav()" class="block w-full text-left py-2 font-medium text-slate-700 hover:text-emerald-600">Categories</button>
+            <button onclick="showPage('products'); toggleMobileNav()" class="block w-full text-left py-2 font-medium text-slate-700 hover:text-emerald-600">All Products</button>
+            <button onclick="showPage('about'); toggleMobileNav()" class="block w-full text-left py-2 font-medium text-slate-700 hover:text-emerald-600">About Us</button>
+            <button onclick="showPage('contact'); toggleMobileNav()" class="block w-full text-left py-2 font-medium text-slate-700 hover:text-emerald-600">Contact Us</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="min-h-screen">
+        
+        <!-- ================= HOME PAGE ================= -->
+        <section id="page-home" class="page-view animate-fade-in-up">
+            <!-- Modern Hero Banner with Glassmorphic Floating Card & Ambient Glows -->
+            <div class="relative bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white overflow-hidden py-14 sm:py-24 lg:py-28 border-b border-emerald-900/30">
+                <!-- Background Glowing Orbs & Mesh Pattern -->
+                <div class="glow-orb w-[500px] h-[500px] bg-emerald-500/25 -top-24 -left-32 animated-pulse-glow"></div>
+                <div class="glow-orb w-[450px] h-[450px] bg-teal-400/20 -bottom-24 -right-24 animated-pulse-glow" style="animation-delay: 1.5s;"></div>
+                <div class="glow-orb w-[300px] h-[300px] bg-emerald-600/20 top-1/2 left-1/3 animated-pulse-glow" style="animation-delay: 2.5s;"></div>
+
+                <!-- Abstract Decorative Grid Pattern Overlay -->
+                <div class="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none z-0"></div>
+
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                        
+                        <!-- Left Hero Content -->
+                        <div class="lg:col-span-7 space-y-6">
+                            <div class="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-500/10 text-emerald-300 rounded-full text-xs font-extrabold tracking-wide border border-emerald-500/30 backdrop-blur-md shadow-lg shadow-emerald-950/50">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                <span>Pasodara Patiya, Kamrej • Supermarket Catalogue</span>
+                            </div>
+
+                            <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
+                                Your Daily Needs, <br>
+                                <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent">Delivered Fresh Daily.</span>
+                            </h1>
+
+                            <p class="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl font-medium">
+                                Browse over 80+ essential groceries, cooking oils, snacks, and hygiene supplies at lowest market prices with direct WhatsApp ordering & fast home delivery.
+                            </p>
+
+                            <!-- CTAs -->
+                            <div class="flex flex-wrap gap-4 pt-2">
+                                <button onclick="showPage('products')" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-2xl shadow-lg shadow-emerald-500/30 transition-all transform hover:-translate-y-0.5 flex items-center space-x-2">
+                                    <span>Browse All Products</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                                <button onclick="showPage('categories')" class="px-8 py-4 bg-slate-900/90 hover:bg-slate-800 text-white font-bold rounded-2xl backdrop-blur-md transition-all border border-slate-700/80 flex items-center space-x-2 shadow-lg">
+                                    <i class="fa-solid fa-grid-2 text-emerald-400"></i>
+                                    <span>Departments</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right Modern Glass Feature Box -->
+                        <div class="lg:col-span-5">
+                            <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-8 rounded-3xl shadow-2xl shadow-black/40 space-y-6 relative overflow-hidden">
+                                <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/30 rounded-full blur-2xl"></div>
+
+                                <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-xl font-bold shadow-inner">
+                                            <i class="fa-solid fa-truck-fast"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-extrabold text-white text-base">Instant Ordering</h3>
+                                            <p class="text-xs text-slate-300">Order via WhatsApp in 1-Click</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-black text-emerald-300 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30">Active</span>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between text-xs text-slate-200 bg-slate-900/50 p-3.5 rounded-2xl border border-white/10 backdrop-blur-md">
+                                        <span class="flex items-center"><i class="fa-solid fa-percent text-amber-400 mr-2 text-sm"></i> Max Savings</span>
+                                        <span class="font-extrabold text-white">Up to 25% Off MRP</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs text-slate-200 bg-slate-900/50 p-3.5 rounded-2xl border border-white/10 backdrop-blur-md">
+                                        <span class="flex items-center"><i class="fa-solid fa-shield-check text-emerald-400 mr-2 text-sm"></i> Quality Check</span>
+                                        <span class="font-extrabold text-white">100% Genuine Brands</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs text-slate-200 bg-slate-900/50 p-3.5 rounded-2xl border border-white/10 backdrop-blur-md">
+                                        <span class="flex items-center"><i class="fa-solid fa-clock text-sky-400 mr-2 text-sm"></i> Store Timing</span>
+                                        <span class="font-extrabold text-white">8:00 AM – 9:30 PM</span>
+                                    </div>
+                                </div>
+
+                                <button onclick="openSearchModal()" class="w-full py-3.5 bg-white hover:bg-emerald-50 text-slate-950 font-black rounded-xl shadow-lg transition-colors flex items-center justify-center space-x-2 text-xs uppercase tracking-wider">
+                                    <i class="fa-solid fa-magnifying-glass text-emerald-600"></i>
+                                    <span>Quick Search Catalogue</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modern Stats Bar -->
+            <div class="bg-white border-b border-slate-200/80 py-6">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div class="space-y-1">
+                        <div class="text-2xl sm:text-3xl font-black text-slate-900">80+</div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Daily FMCG Products</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-2xl sm:text-3xl font-black text-emerald-600">100%</div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Fresh Stock Guaranteed</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-2xl sm:text-3xl font-black text-slate-900">7 Days</div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Store Open Weekly</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-2xl sm:text-3xl font-black text-teal-600">Instant</div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">WhatsApp Checkout</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Categories Grid (Home) -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <span class="text-emerald-600 font-extrabold text-xs uppercase tracking-widest block mb-1">Explore Store</span>
+                        <h2 class="text-3xl font-black text-slate-900">Featured Departments</h2>
+                    </div>
+                    <button onclick="showPage('categories')" class="text-emerald-600 font-bold hover:text-emerald-700 flex items-center group">
+                        <span>All Categories</span>
+                        <i class="fa-solid fa-chevron-right text-xs ml-1.5 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div onclick="filterCategoryAndOpen('Groceries & Staples')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-sm border border-slate-200 card-hover-lift group relative overflow-hidden">
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-wheat-awn"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Groceries & Staples</h3>
+                        <p class="text-slate-500 text-sm mb-4">Atta, Basmati Rice, Edible Oils, Pulses & Spices</p>
+                        <span class="text-emerald-600 font-semibold text-sm inline-flex items-center group-hover:translate-x-1 transition-transform">Explore <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+
+                    <div onclick="filterCategoryAndOpen('Snacks & Beverages')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-sm border border-slate-200 card-hover-lift group relative overflow-hidden">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-cookie"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Snacks & Beverages</h3>
+                        <p class="text-slate-500 text-sm mb-4">Tea, Coffee, Biscuits, Chips & Cold Drinks</p>
+                        <span class="text-emerald-600 font-semibold text-sm inline-flex items-center group-hover:translate-x-1 transition-transform">Explore <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+
+                    <div onclick="filterCategoryAndOpen('Personal Care & Hygiene')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-sm border border-slate-200 card-hover-lift group relative overflow-hidden">
+                        <div class="w-16 h-16 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-sky-500 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-pump-soap"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Personal Care</h3>
+                        <p class="text-slate-500 text-sm mb-4">Soaps, Shampoos, Toothpaste & Skincare</p>
+                        <span class="text-emerald-600 font-semibold text-sm inline-flex items-center group-hover:translate-x-1 transition-transform">Explore <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+
+                    <div onclick="filterCategoryAndOpen('Household Cleaning')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-sm border border-slate-200 card-hover-lift group relative overflow-hidden">
+                        <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-broom"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Household Cleaning</h3>
+                        <p class="text-slate-500 text-sm mb-4">Detergents, Floor Cleaners & Disinfectants</p>
+                        <span class="text-emerald-600 font-semibold text-sm inline-flex items-center group-hover:translate-x-1 transition-transform">Explore <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store Guarantee & Location Banner -->
+            <div class="bg-slate-900 text-white py-14 border-t border-slate-800">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="flex items-center space-x-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">100% Original Brands</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">Directly sourced FMCG products.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">Fresh Stock Assured</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">Strict quality & freshness checks.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold shrink-0">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">In-Store Shopping</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">Pasodara Patiya, Kamrej, Surat.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CATEGORIES PAGE ================= -->
+        <section id="page-categories" class="page-view hidden animate-fade-in-up py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10">
+                    <h1 class="text-3xl font-extrabold text-slate-900">All Store Categories</h1>
+                    <p class="text-slate-500 mt-2">Explore our complete supermarket product sections</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div onclick="filterCategoryAndOpen('Groceries & Staples')" class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm card-hover-lift cursor-pointer group">
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl font-bold mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-wheat-awn"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-3">Groceries & Staples</h2>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6">Explore our widest selection of premium flour, basmati rice, pure ghee, cooking oils, pulses, and authentic ground spices.</p>
+                        <span class="inline-flex items-center font-bold text-emerald-600 group-hover:translate-x-2 transition-transform">
+                            View 20 Products <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </span>
+                    </div>
+
+                    <div onclick="filterCategoryAndOpen('Snacks & Beverages')" class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm card-hover-lift cursor-pointer group">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-3xl font-bold mb-6 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-cookie"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-3">Snacks & Beverages</h2>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6">Crispy potato chips, healthy cookies, instant coffee, refreshing tea blends, cold drinks, and evening snacks.</p>
+                        <span class="inline-flex items-center font-bold text-emerald-600 group-hover:translate-x-2 transition-transform">
+                            View 20 Products <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </span>
+                    </div>
+
+                    <div onclick="filterCategoryAndOpen('Personal Care & Hygiene')" class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm card-hover-lift cursor-pointer group">
+                        <div class="w-16 h-16 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-3xl font-bold mb-6 group-hover:bg-sky-500 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-pump-soap"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-3">Personal Care & Hygiene</h2>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6">Daily bathing soaps, anti-dandruff shampoos, oral hygiene care, hair oils, face washes, and moisturizing creams.</p>
+                        <span class="inline-flex items-center font-bold text-emerald-600 group-hover:translate-x-2 transition-transform">
+                            View 20 Products <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </span>
+                    </div>
+
+                    <div onclick="filterCategoryAndOpen('Household Cleaning')" class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm card-hover-lift cursor-pointer group">
+                        <div class="w-16 h-16 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-3xl font-bold mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-broom"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-3">Household Cleaning</h2>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6">Fabric washing powders, liquid detergents, surface cleaners, dishwashing bars, and bathroom sanitation supplies.</p>
+                        <span class="inline-flex items-center font-bold text-emerald-600 group-hover:translate-x-2 transition-transform">
+                            View 20 Products <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PRODUCTS PAGE ================= -->
+        <section id="page-products" class="page-view hidden animate-fade-in-up py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header & Controls -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-slate-900">Product Catalogue</h1>
+                        <p class="text-slate-500 mt-1">Showing all available products with live pricing</p>
+                    </div>
+
+                    <!-- Search Input in Products Page -->
+                    <div class="w-full md:w-80">
+                        <div class="relative">
+                            <input type="text" id="page-search-input" oninput="handlePageSearch()" placeholder="Search products..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Filter Pills -->
+                <div class="flex flex-wrap gap-2 mb-8" id="category-pills"></div>
+
+                <!-- Products Grid -->
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+
+                <!-- No Results State -->
+                <div id="no-results" class="hidden text-center py-16">
+                    <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 text-3xl">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">No items found</h3>
+                    <p class="text-slate-500 text-sm mt-1">Try selecting a different category filter or search keyword.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ABOUT US PAGE ================= -->
+        <section id="page-about" class="page-view hidden animate-fade-in-up py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="relative rounded-3xl overflow-hidden mb-12 shadow-xl bg-slate-900 text-white min-h-[380px] flex items-center">
+                    <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200&auto=format&fit=crop&q=80" 
+                         alt="Radhika Super Mart Interior" 
+                         class="absolute inset-0 w-full h-full object-cover opacity-45">
+                    <div class="relative z-10 p-8 sm:p-12 max-w-2xl">
+                        <span class="inline-block px-3 py-1 bg-emerald-500 text-white font-semibold rounded-full text-xs uppercase tracking-wider mb-4">Established Local Supermarket</span>
+                        <h1 class="text-3xl sm:text-5xl font-black mb-4 leading-tight">Serving Our Community With Quality & Integrity</h1>
+                        <p class="text-slate-300 text-base sm:text-lg">Radhika Super Mart is your trusted neighborhood supermarket in Kamrej, Surat. We bring you authentic daily essentials, fresh groceries, and packaged household goods under one roof.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Our Mission</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">To provide clean, fresh, and reliable FMCG products at fair market value with friendly customer service.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Customer First</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">We carefully curate every item on our shelves to ensure maximum quality and fresh stock guarantee.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Modern Ambience</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">Clean, organized aisles designed to give you a hassle-free and pleasant daily shopping experience.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CONTACT US PAGE ================= -->
+        <section id="page-contact" class="page-view hidden animate-fade-in-up py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10 text-center max-w-2xl mx-auto">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900">Visit Our Store</h1>
+                    <p class="text-slate-500 mt-2">Have a question or looking for specific products? Get in touch with us or drop by our store in Kamrej.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-12">
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                        <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4">Store Information</h2>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0 mt-1">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">Store Address</h4>
+                                <p class="text-slate-600 text-sm leading-relaxed mt-1">Near Labheshwar Dairy, opposite Aarambh Heights, Pasodara Patiya, Kamrej, Surat, Gujarat 394190</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0 mt-1">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">Phone Number</h4>
+                                <p class="text-slate-600 text-sm mt-1">+91 63550 59308</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0 mt-1">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">Opening Hours</h4>
+                                <p class="text-slate-600 text-sm mt-1">Monday – Sunday: 8:00 AM – 9:30 PM</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                        <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-6">Send Inquiry</h2>
+                        <form onsubmit="handleInquirySubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Your Name</label>
+                                <input type="text" required placeholder="Enter full name" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number</label>
+                                <input type="tel" required placeholder="Enter mobile number" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Message</label>
+                                <textarea rows="3" required placeholder="Write your query..." class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors shadow-md">
+                                Submit Inquiry
+                            </button>
+                        </form>
+                        <div id="inquirySuccessMsg" class="hidden mt-4 p-3 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-xl text-center">
+                            Thank you! We received your message and will respond shortly.
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Location Map</h2>
+                            <div class="w-full h-64 rounded-2xl overflow-hidden border border-slate-200 shadow-inner mb-4 relative">
+                                <iframe 
+                                    title="Radhika Super Mart Location"
+                                    src="https://maps.google.com/maps?q=Radhika+Super+Mart+Near+Labheshwar+Dairy+opposite+Aarambh+Heights+Pasodara+Patiya+Kamrej+Surat+Gujarat+394190&t=&z=16&ie=UTF8&iwloc=&output=embed" 
+                                    width="100%" 
+                                    height="100%" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy">
+                                </iframe>
+                            </div>
+                        </div>
+
+                        <a href="https://www.google.com/maps/search/?api=1&query=Radhika+Super+Mart+Near+Labheshwar+Dairy+opposite+Aarambh+Heights+Pasodara+Patiya+Kamrej+Surat+Gujarat+394190" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="w-full py-3 bg-slate-900 hover:bg-emerald-600 text-white font-bold rounded-xl text-center flex items-center justify-center space-x-2 transition-colors">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <span>View on Google Maps</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Shopping Cart Slide-over Drawer -->
+    <div id="cart-drawer-overlay" onclick="toggleCartDrawer()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden transition-opacity"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-slate-900 text-lg">Your Cart</h3>
+                    <p id="cart-drawer-item-count" class="text-xs text-slate-500 font-medium">0 items selected</p>
+                </div>
+            </div>
+            <button onclick="toggleCartDrawer()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
+
+        <div id="cart-empty-state" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400 text-3xl">
+                <i class="fa-solid fa-basket-shopping"></i>
+            </div>
+            <h4 class="font-bold text-slate-800 text-base">Your cart is empty</h4>
+            <p class="text-xs text-slate-400 mt-1 mb-6 max-w-xs">Looks like you haven't added any products to your cart yet.</p>
+            <button onclick="toggleCartDrawer(); showPage('products');" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors">
+                Start Shopping Now
+            </button>
+        </div>
+
+        <div id="cart-footer" class="p-5 border-t border-slate-100 bg-slate-50 space-y-4 hidden">
+            <div class="flex items-center justify-between text-base font-black text-slate-900">
+                <span>Grand Total</span>
+                <span id="cart-grand-total" class="text-emerald-600 text-xl">₹0</span>
+            </div>
+            <button onclick="openCheckoutModal()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl shadow-lg shadow-emerald-500/30 flex items-center justify-center space-x-2 transition-all">
+                <span>Proceed to WhatsApp Checkout</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Multi-Step Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="pb-4 border-b border-slate-100 mb-5">
+                <h3 class="font-extrabold text-lg text-slate-900">Complete Your Order</h3>
+                <p class="text-xs text-slate-500">Provide details for home delivery or pickup</p>
+            </div>
+
+            <form onsubmit="processOrderAndWhatsApp(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name *</label>
+                    <input type="text" id="cust-name" required placeholder="Enter your full name" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp Mobile Number *</label>
+                    <input type="tel" id="cust-phone" required placeholder="Enter 10-digit mobile number" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fulfillment Option *</label>
+                    <select id="cust-fulfillment" onchange="toggleAddressField()" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 text-sm bg-white font-medium">
+                        <option value="Home Delivery">Home Delivery</option>
+                        <option value="Store Pickup">Self Store Pickup</option>
+                    </select>
+                </div>
+
+                <div id="address-container">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Delivery Address *</label>
+                    <textarea id="cust-address" rows="2" placeholder="Society name, flat no, landmark..." class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 text-sm"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payment Method *</label>
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                        <label class="border border-slate-200 rounded-xl p-3 flex items-center space-x-2 cursor-pointer hover:bg-slate-50">
+                            <input type="radio" name="payMethod" value="COD" checked onchange="handlePaymentMethodChange()" class="text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-xs font-bold text-slate-800">Cash on Delivery</span>
+                        </label>
+                        <label class="border border-slate-200 rounded-xl p-3 flex items-center space-x-2 cursor-pointer hover:bg-slate-50">
+                            <input type="radio" name="payMethod" value="UPI" onchange="handlePaymentMethodChange()" class="text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-xs font-bold text-slate-800">Online UPI Pay</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Dynamic UPI QR Scanner Box -->
+                <div id="upi-payment-box" class="hidden bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 text-center space-y-3">
+                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block">Scan & Pay Exact Total</span>
+                    <div class="w-40 h-40 bg-white mx-auto rounded-xl p-2 border border-slate-200 shadow-sm flex items-center justify-center">
+                        <img id="upi-qr-image" src="" alt="UPI QR Code" class="w-full h-full object-contain">
+                    </div>
+                    <div class="text-center">
+                        <span class="text-xs text-slate-500">Payable Amount:</span>
+                        <div id="upi-payable-amount" class="text-lg font-black text-emerald-700">₹0</div>
+                    </div>
+                    <a id="direct-upi-btn" href="#" target="_blank" class="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-emerald-700">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <span>Tap to Open UPI App</span>
+                    </a>
+                    <div class="text-left pt-2 border-t border-emerald-200/60">
+                        <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Enter 12-Digit UPI UTR / Ref No *</label>
+                        <input type="text" id="cust-utr" placeholder="e.g. 402918274619" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl shadow-lg shadow-emerald-500/30 flex items-center justify-center space-x-2 transition-all">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Confirm & Send Order via WhatsApp</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Detail Quick View Lightbox Modal -->
+    <div id="product-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"></div>
+
+    <!-- Search Modal Overlay -->
+    <div id="search-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-start justify-center pt-20 px-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-6 relative">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <h3 class="font-bold text-lg text-slate-900">Search Products</h3>
+                <button onclick="closeSearchModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="mt-4">
+                <input type="text" id="modal-search-input" oninput="handleModalSearch()" placeholder="Type product name (e.g. Atta, Oil, Soap, Tea)..." class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
+            </div>
+            <div id="modal-search-results" class="mt-6 max-h-80 overflow-y-auto space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast-notification" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl z-50 flex items-center space-x-3 opacity-0 pointer-events-none transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message" class="text-xs font-bold">Item added to cart!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+            <p>&copy; 2026 Radhika Super Mart. All rights reserved. Pasodara Patiya, Kamrej, Surat.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Global Fallback SVG Data URI
+        const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'><rect width='400' height='300' fill='%23f1f5f9'/><circle cx='200' cy='120' r='35' fill='%23cbd5e1'/><path d='M140 220 C140 170, 260 170, 260 220 Z' fill='%23cbd5e1'/><text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%2364748b'>Radhika Super Mart</text></svg>";
+
+        // Cart State Array
+        let cart = [];
+
+        // Comprehensive 80 Products Database with Market Prices
+        const products = [
+            // Groceries & Staples (20 Products)
+            { id: 1, name: "Aashirvaad Shudh Chakki Atta (10kg)", category: "Groceries & Staples", price: 425, mrp: 490, discount: 13, image: "https://desistore.dk/wp-content/uploads/2022/12/ashirwad-chakki-atta.jpg?utm_source=chatgpt.com", rating: 4.8 },
+            { id: 2, name: "Fortune Sunlite Sunflower Oil (5L)", category: "Groceries & Staples", price: 685, mrp: 780, discount: 12, image: "https://www.desiclik.com/images/P/d43279c9a78b15d1132cf4c404885d161ff367509264452d50846511884af011-01.jpg", rating: 4.7 },
+            { id: 3, name: "Tata Salt Vacuum Evaporated (1kg)", category: "Groceries & Staples", price: 28, mrp: 30, discount: 6, image: "https://storage.googleapis.com/shy-pub/319551/1695488064144_1.jpeg", rating: 4.9 },
+            { id: 4, name: "India Gate Basmati Rice Feast Rozzana (5kg)", category: "Groceries & Staples", price: 395, mrp: 475, discount: 17, image: "https://image.aapkabazar.co/product/16170/1737375957418.png?type=webp&width=800", rating: 4.8 },
+            { id: 5, name: "Madhur Pure & Hygiene Sugar (1kg)", category: "Groceries & Staples", price: 52, mrp: 60, discount: 13, image: "https://www.madhursugar.com/assets/images/adv-pack-green.png", rating: 4.6 },
+            { id: 6, name: "Tata Sampann Toor Dal / Arhar Dal (1kg)", category: "Groceries & Staples", price: 165, mrp: 190, discount: 13, image: "https://www.bbassets.com/media/uploads/p/l/40000291_14-tata-sampann-unpolished-toor-dalarhar-dal.jpg", rating: 4.7 },
+            { id: 7, name: "Amul Pure Cow Ghee Tin (1L)", category: "Groceries & Staples", price: 645, mrp: 690, discount: 6, image: "https://cdn.mafrservices.com/pim-content/UAE/media/product/1532091/1750222803/1532091_main.jpg", rating: 4.9 },
+            { id: 8, name: "Fortune Premium Kachi Ghani Mustard Oil (1L)", category: "Groceries & Staples", price: 155, mrp: 180, discount: 14, image: "https://www.bbassets.com/media/uploads/p/xxl/40051744_11-fortune-fortune-premium-kachi-ghani-pure-mustard-oil.jpg", rating: 4.6 },
+            { id: 9, name: "Everest Tikhalal Red Chilli Powder (200g)", category: "Groceries & Staples", price: 110, mrp: 130, discount: 15, image: "https://prithvienterprises.co.in/cdn/shop/files/sliding_images_jpeg_4157bf50_e80c_420a_a964_747dd58cea02jpgts1708588722_300a15c0-ce26-47fa-b5f4-f3e6916b951a.jpg?v=1746842849&width=1946", rating: 4.7 },
+            { id: 10, name: "Everest Turmeric / Haldi Powder (200g)", category: "Groceries & Staples", price: 72, mrp: 85, discount: 15, image: "https://cdn.dmart.in/images/products/IPowderMasala200gmEVRS3774xx281220_5_B.jpg", rating: 4.8 },
+            { id: 11, name: "Tata Sampann Moong Dal (1kg)", category: "Groceries & Staples", price: 140, mrp: 165, discount: 15, image: "https://instamart-media-assets.swiggy.com/swiggy/image/upload/fl_lossy%2Cf_auto%2Cq_auto/NI_CATALOG/IMAGES/ciw/2025/12/16/8c62c104-18cf-4055-9dec-4f6745c00390_SRT6H6INB4_MN_15122025.png", rating: 4.5 },
+            { id: 12, name: "Tata Sampann Chana Dal (1kg)", category: "Groceries & Staples", price: 95, mrp: 115, discount: 17, image: "https://storage.googleapis.com/shy-pub/285827/1678617307608_chanadal1000.jpeg", rating: 4.6 },
+            { id: 13, name: "Fortune Filtered Groundnut Oil (5L)", category: "Groceries & Staples", price: 940, mrp: 1080, discount: 13, image: "https://www.bbassets.com/media/uploads/p/xl/40132145_7-fortune-oil-grounutt-activ.jpg", rating: 4.7 },
+            { id: 14, name: "Catch Coriander / Dhaniya Powder (200g)", category: "Groceries & Staples", price: 62, mrp: 75, discount: 17, image: "https://i.ebayimg.com/images/g/1o8AAOSwjuRmubsM/s-l1200.jpg", rating: 4.5 },
+            { id: 15, name: "Fortune Rice Bran Health Oil (1L)", category: "Groceries & Staples", price: 145, mrp: 170, discount: 15, image: "https://www.mystore.in/s/62ea2c599d1398fa16dbae0a/67af7649fb10b8cb98c9f39b/40064221_1.png", rating: 4.6 },
+            { id: 16, name: "Amul Butter Pasteurised (500g)", category: "Groceries & Staples", price: 275, mrp: 290, discount: 5, image: "https://image.cdn.shpy.in/474920/butter500g-1771006400709.png?format=webp", rating: 4.9 },
+            { id: 17, name: "Amul Taaza Toned Fresh Milk (1L Pouch)", category: "Groceries & Staples", price: 54, mrp: 56, discount: 4, image: "https://cdn.shopify.com/s/files/1/0774/0607/7125/files/Amul-Taaza-Toned-Fresh-Milk-Pouch_51466e85-d2ba-4805-9662-6711b6407cfe.jpg?v=1775569951", rating: 4.8 },
+            { id: 18, name: "Everest Garam Masala (100g)", category: "Groceries & Staples", price: 88, mrp: 102, discount: 14, image: "https://aapkabazar.co/_next/image?q=75&url=https%3A%2F%2Fimage.aapkabazar.co%2Fproduct%2F6967%2F1736080585761.png%3Ftype%3Dpng&w=1080", rating: 4.7 },
+            { id: 19, name: "Saffola Gold Blended Edible Oil (5L Jar)", category: "Groceries & Staples", price: 790, mrp: 920, discount: 14, image: "https://cdn.shopaccino.com/edible-smart/products/saffola-gold---pro-healthy-lifestyle-edible-oil-109720_l.jpg?v=676", rating: 4.8 },
+            { id: 20, name: "Patanjali Whole Wheat Chakki Atta (10kg)", category: "Groceries & Staples", price: 385, mrp: 440, discount: 12, image: "https://cdn.grofers.com/cdn-cgi/image/f%3Dauto%2Cfit%3Dscale-down%2Cq%3D85%2Cmetadata%3Dnone%2Cw%3D480%2Ch%3D480/app/images/products/full_screen/pro_55388.jpg?ts=1661425326", rating: 4.5 },
+
+            // Snacks & Beverages (20 Products)
+            { id: 21, name: "Red Label Natural Care Tea (500g)", category: "Snacks & Beverages", price: 310, mrp: 370, discount: 16, image: "https://cdn2.clevup.in/321245/1700484646962_SKU-0315_0.jpeg?format=webp&width=600", rating: 4.8 },
+            { id: 22, name: "Nescafe Classic Instant Coffee Powder (100g Jar)", category: "Snacks & Beverages", price: 340, mrp: 395, discount: 14, image: "https://m.media-amazon.com/images/I/71OexQTz4-L._SL1000_.jpg", rating: 4.8 },
+            { id: 23, name: "Cadbury Dairy Milk Silk Chocolate Bar (150g)", category: "Snacks & Beverages", price: 165, mrp: 185, discount: 11, image: "https://mudi24seven.com/image/cache/catalog/Mudi24Seven/Candy%20Chocolate/Dairy-Milk-silk-150gm-550x550.jpg.webp", rating: 4.9 },
+            { id: 24, name: "Lay's India's Magic Masala Chips (115g)", category: "Snacks & Beverages", price: 45, mrp: 50, discount: 10, image: "https://image.cdn.shpy.in/416209/SKU-1156_0-1740203336925.jpg?format=webp", rating: 4.7 },
+            { id: 25, name: "Parle-G Original Glucose Biscuits (800g Pack)", category: "Snacks & Beverages", price: 82, mrp: 95, discount: 14, image: "https://17mins.com/cdn/shop/files/Parle-G-Original-Gluco-Biscuits_1.webp?v=1791014477&width=800", rating: 4.9 },
+            { id: 26, name: "Britannia Good Day Cashew Cookies (600g)", category: "Snacks & Beverages", price: 140, mrp: 165, discount: 15, image: "https://services.kpnfresh.com/media/v1/products/images/b15e3425-5faf-45b6-bc11-af3611e055f7/britannia-good-day-cashew-cookies.webp?c_type=C1", rating: 4.7 },
+            { id: 27, name: "Coca-Cola Original Taste Soft Drink (2.25L)", category: "Snacks & Beverages", price: 90, mrp: 100, discount: 10, image: "https://services.kpnfresh.com/media/v1/products/images/5aea4fff-758e-4a46-bb41-b0c712a2676d/cocacola-soft-drink-bottle.webp?c_type=C1", rating: 4.8 },
+            { id: 28, name: "Thums Up Soft Drink Can (300ml)", category: "Snacks & Beverages", price: 38, mrp: 40, discount: 5, image: "https://easytohome.com/user/products/1779707154_61yecBpCDhL._SX679_.jpg", rating: 4.7 },
+            { id: 29, name: "Haldiram's Nagpur Aloo Bhujia Pack (400g)", category: "Snacks & Beverages", price: 115, mrp: 135, discount: 15, image: "https://bf1af2.akinoncloudcdn.com/products/2026/02/11/68465/cf7b04b9-5310-43ab-af5d-9feb589e5ff9.jpg", rating: 4.8 },
+            { id: 30, name: "Wagh Bakri Premium Leaf Tea Jar (1kg)", category: "Snacks & Beverages", price: 540, mrp: 620, discount: 13, image: "https://www.grocerz.com.au/storage/5971/Wagh-Bakri---Premium-Tea-Jar-_-1kg.webp", rating: 4.9 },
+            { id: 31, name: "Bru Instant Coffee Powder (200g Pouch)", category: "Snacks & Beverages", price: 325, mrp: 380, discount: 14, image: "https://image.aapkabazar.co/product/615/1764482331085.png?type=webp&width=600", rating: 4.6 },
+            { id: 32, name: "Maggi 2-Minute Masala Instant Noodles (12 Pack)", category: "Snacks & Beverages", price: 158, mrp: 180, discount: 12, image: "https://cdn.grofers.com/cdn-cgi/image/f%3Dauto%2Cfit%3Dscale-down%2Cq%3D70%2Cmetadata%3Dnone%2Cw%3D1080/da/cms-assets/cms/product/eb90c25c-5eeb-4f3b-885c-c73f5d983576.png", rating: 4.9 },
+            { id: 33, name: "Real Fruit Power Mango Juice (1L Carton)", category: "Snacks & Beverages", price: 110, mrp: 130, discount: 15, image: "https://shreenathfoods.com/cdn/shop/products/DaburRealMangoJuice1ltr_1024x1024.jpg?v=1676458749", rating: 4.7 },
+            { id: 34, name: "Sprite Lemon-Lime Soft Drink Bottle (2L)", category: "Snacks & Beverages", price: 85, mrp: 95, discount: 10, image: "https://cdn.freshful.ro/media/cache/sylius_shop_product_original/da/1f/8cb60c499a841352e6dbe300dd85.jpg", rating: 4.6 },
+            { id: 35, name: "Britannia Marie Gold Biscuit Family Pack (300g)", category: "Snacks & Beverages", price: 42, mrp: 50, discount: 16, image: "https://cdn11.bigcommerce.com/s-tgrcca6nho/products/19317/images/60748/Britannia-Marie-Gold-300gm__97335.1741861914.386.513.jpg?c=1", rating: 4.5 },
+            { id: 36, name: "Kurkure Masala Munch Crispy Snacks (90g)", category: "Snacks & Beverages", price: 20, mrp: 20, discount: 0, image: "https://services.kpnfresh.com/media/v1/products/images/b3e62d7d-af10-475e-b648-4c299dd84819/kurkure-masala-munch.webp?c_type=C1", rating: 4.6 },
+            { id: 37, name: "Amul Kool Cafe Flavoured Milk Can (200ml)", category: "Snacks & Beverages", price: 35, mrp: 40, discount: 12, image: "https://gandhifood.com/cdn/shop/products/20005992_2-amul-kool-cafe-milk-coffee_800x.jpg?v=1629313922", rating: 4.7 },
+            { id: 38, name: "Cadbury Bournvita Chocolate Drink (500g Jar)", category: "Snacks & Beverages", price: 235, mrp: 270, discount: 13, image: "https://cdn01.pharmeasy.in/dam/products_otc/028345/bournvita-choco-powder-500gm-jar-6.1-1632774718.jpg", rating: 4.8 },
+            { id: 39, name: "Haldiram's Nagpur Khatta Meetha Namkeen (350g)", category: "Snacks & Beverages", price: 98, mrp: 115, discount: 15, image: "https://indiangrocerystore.ca/cdn/shop/files/haldiramskhattameetha.jpg?v=1691788809&width=1024", rating: 4.7 },
+            { id: 40, name: "Sunfeast Dark Fantasy Choco Fills (300g)", category: "Snacks & Beverages", price: 145, mrp: 175, discount: 17, image: "https://d91ztqmtx7u1k.cloudfront.net/ClientContent/Images/Catalogue/itc-dark-fantasy-choco-fills-3-20240923175250466.jpg", rating: 4.9 },
+
+            // Personal Care & Hygiene (20 Products)
+            { id: 41, name: "Dettol Original Soap (125g Pack of 4)", category: "Personal Care & Hygiene", price: 225, mrp: 260, discount: 13, image: "https://www.vishalmegamart.com/on/demandware.static/-/Sites-vmm-fmcg-master-catalog/default/dw0a6b893f/images/large/1311020825.jpg", rating: 4.8 },
+            { id: 42, name: "Dove Cream Beauty Bathing Bar (100g Pack of 3)", category: "Personal Care & Hygiene", price: 195, mrp: 230, discount: 15, image: "https://np-live-21.slatic.net/kf/S69589b9e4c11434abbb47998bdcdbc15c.png", rating: 4.9 },
+            { id: 43, name: "Colgate Strong Teeth Toothpaste (500g Saver)", category: "Personal Care & Hygiene", price: 245, mrp: 290, discount: 15, image: "https://cdn.grofers.com/app/images/products/sliding_image/19184a.jpg?ts=1688374852", rating: 4.8 },
+            { id: 44, name: "Head & Shoulders Smooth Shampoo (650ml)", category: "Personal Care & Hygiene", price: 540, mrp: 650, discount: 17, image: "https://rukminim2.flixcart.com/image/832/832/khmbafk0-0/shampoo/h/o/u/1-smooth-silky-head-and-shoulders-original-imafxhevruczsgph.jpeg", rating: 4.7 },
+            { id: 45, name: "Pantene Pro-V Hair Fall Control Shampoo (1L)", category: "Personal Care & Hygiene", price: 680, mrp: 820, discount: 17, image: "https://cdn01.pharmeasy.in/dam/products_otc/C32561/pantene-hair-fall-control-shampoo-1-litre-6.1-1632780547.jpg", rating: 4.6 },
+            { id: 46, name: "Nivea Soft Light Moisturizing Cream (300ml)", category: "Personal Care & Hygiene", price: 345, mrp: 410, discount: 16, image: "https://cdn11.bigcommerce.com/s-ilgxsy4t82/images/stencil/1280x1280/products/21324/28677/61ft3nmq1AL._AC_SL1180__39067.1656714752.jpg?c=1&imbypass=on", rating: 4.8 },
+            { id: 47, name: "Pears Pure & Gentle Soap Bar (125g Pack of 3)", category: "Personal Care & Hygiene", price: 180, mrp: 215, discount: 16, image: "https://m.media-amazon.com/images/I/61BGF7aIkxL._SL1000_.jpg", rating: 4.7 },
+            { id: 48, name: "Sensodyne Rapid Relief Toothpaste (100g)", category: "Personal Care & Hygiene", price: 210, mrp: 240, discount: 12, image: "https://www.netpharmacy.co.nz/cdn/shop/products/sensodyne-rapid-relief-toothpaste-100g.png?v=1648412178", rating: 4.9 },
+            { id: 49, name: "Garnier Bright Complete Face Wash (150g)", category: "Personal Care & Hygiene", price: 220, mrp: 260, discount: 15, image: "https://rukminim2.flixcart.com/image/832/832/xif0q/face-wash/o/a/q/-original-imagtrzhea6z8qef.jpeg?crop=false&q=70", rating: 4.6 },
+            { id: 50, name: "Parachute 100% Pure Coconut Hair Oil (500ml)", category: "Personal Care & Hygiene", price: 195, mrp: 230, discount: 15, image: "https://www.asetenapa.co.uk/cdn/shop/files/image_135fb04c-a1e1-47d9-8477-6cc5f5f1da61.png?v=1769484584&width=1946", rating: 4.9 },
+            { id: 51, name: "Dettol Original Liquid Handwash (200ml)", category: "Personal Care & Hygiene", price: 95, mrp: 110, discount: 13, image: "https://cdn.dmart.in/images/products/FEB140000402xx9FEB26vvG200ml_5_B.jpg", rating: 4.7 },
+            { id: 52, name: "Himalaya Purifying Neem Face Wash (200ml)", category: "Personal Care & Hygiene", price: 240, mrp: 285, discount: 16, image: "https://www.bbassets.com/media/uploads/p/xl/40000439_5-himalaya-purifying-neem-face-wash.jpg", rating: 4.8 },
+            { id: 53, name: "Wild Stone Code Titanium Spray (150ml)", category: "Personal Care & Hygiene", price: 215, mrp: 255, discount: 15, image: "https://rukminim2.flixcart.com/image/480/640/xif0q/deodorant/t/6/f/150-men-code-titanium-no-gas-body-perfume-deodorant-150-ml-1-enriched-transparent-original-imahkf8hgnnjzh7z.png?q=20", rating: 4.6 },
+            { id: 54, name: "Envy Speed Perfume Deodorant Spray (120ml)", category: "Personal Care & Hygiene", price: 185, mrp: 220, discount: 16, image: "https://envyfragrances.com/cdn/shop/files/SPEED_719a72f5-65f2-41a5-ac74-44ac33d590e2.jpg?v=1709707762", rating: 4.7 },
+            { id: 55, name: "Gillette Mach3 Turbo Razor Blades (4 Pack)", category: "Personal Care & Hygiene", price: 540, mrp: 625, discount: 13, image: "https://images.ctfassets.net/7tfi3razjgvb/5TA60wK1e5yIlppkwUkY1X/ccd24ce7bf3283057be9e4f90a524673/gillette-mach3-razor-turbo-overview-mobile-mach3-turbo-razor-blades.png?fm=webp&q=70&w=1600", rating: 4.8 },
+            { id: 56, name: "Vaseline Deep Moisture Body Lotion (400ml)", category: "Personal Care & Hygiene", price: 310, mrp: 375, discount: 17, image: "https://images-static.nykaa.com/media/catalog/product/c/4/c44a84b8901030733543_1.jpg", rating: 4.8 },
+            { id: 57, name: "Whisper Choice Ultra Wings Sanitary Pads (20s)", category: "Personal Care & Hygiene", price: 145, mrp: 170, discount: 15, image: "https://cdn01.pharmeasy.in/dam/products_otc/I39006/whisper-choice-ultra-wings-size-xl-sanitary-pads-packet-of-20-6.1-1613385495.jpg", rating: 4.9 },
+            { id: 58, name: "Santoor Sandalwood Soap (125g Pack of 4)", category: "Personal Care & Hygiene", price: 165, mrp: 195, discount: 15, image: "https://cdn.mafrservices.com/pim-content/UAE/media/product/2286653/1772125800/2286653_main.jpg", rating: 4.6 },
+            { id: 59, name: "Close-Up Red Hot Gel Toothpaste (150g)", category: "Personal Care & Hygiene", price: 110, mrp: 130, discount: 15, image: "https://www.bbassets.com/media/uploads/p/l/266639_18-close-up-everfresh-anti-germ-gel-toothpaste-red-hot.jpg", rating: 4.5 },
+            { id: 60, name: "Dabur Red Ayurvedic Toothpaste (300g)", category: "Personal Care & Hygiene", price: 155, mrp: 180, discount: 14, image: "https://static2.medplusmart.com/products/_5981873_/DABU0074_L.jpg", rating: 4.7 },
+
+            // Household Cleaning (20 Products)
+            { id: 61, name: "Surf Excel Easy Wash Detergent Powder (5kg)", category: "Household Cleaning", price: 585, mrp: 680, discount: 14, image: "https://cdn2.clevup.in/410557/SurfExcelPowder15Kg-1736064487534.webp?format=webp&width=600", rating: 4.9 },
+            { id: 62, name: "Vim Dishwash Gel Lemon (750ml Bottle)", category: "Household Cleaning", price: 185, mrp: 215, discount: 14, image: "https://cdn01.pharmeasy.in/dam/products_otc/E52367/vim-dishwash-liquid-gel-lemon-750ml-bottle-2-1671743048.jpg?dim=768x585&q=100", rating: 4.8 },
+            { id: 63, name: "Lizol Surface Cleaner Citrus (2L)", category: "Household Cleaning", price: 345, mrp: 410, discount: 16, image: "https://healthyhome.co.in/cdn/shop/products/B00NWFXTJY.MAIN_1024x1024.jpg?v=1625806712&utm_source=chatgpt.com", rating: 4.8 },
+            { id: 64, name: "Harpic Power Plus Toilet Cleaner (1L Pack of 2)", category: "Household Cleaning", price: 335, mrp: 395, discount: 15, image: "https://bf1af2.akinoncloudcdn.com/products/2025/10/13/130414/71dbdf68-b4c5-44c8-876e-7db28742e778_size3840_cropCenter.jpg", rating: 4.9 },
+            { id: 65, name: "Ariel Matic Front Load Powder (4kg)", category: "Household Cleaning", price: 820, mrp: 990, discount: 17, image: "https://rukminim2.flixcart.com/image/480/640/xif0q/washing-powder/0/6/3/-original-imahb94ghszgh48a.jpeg", rating: 4.8 },
+            { id: 66, name: "Comfort After Wash Conditioner (1.5L)", category: "Household Cleaning", price: 340, mrp: 400, discount: 15, image: "https://www.bbassets.com/media/uploads/p/s/40001385_23-comfort-fabric-conditioner-after-wash-lily-fresh.jpg", rating: 4.7 },
+            { id: 67, name: "Colin Glass Cleaner Spray Refill (500ml)", category: "Household Cleaning", price: 92, mrp: 108, discount: 15, image: "https://healthyhome.co.in/cdn/shop/products/7_742317b8-f497-437e-97b6-0d87a9b22b86_1024x1024.jpg?v=1623065812", rating: 4.6 },
+            { id: 68, name: "Pril Dishwash Liquid Lime (500ml)", category: "Household Cleaning", price: 125, mrp: 145, discount: 14, image: "https://www.bbassets.com/media/uploads/p/l/280780_5-pril-dishwash-liquid-active-2x-lime.jpg", rating: 4.7 },
+            { id: 69, name: "Tide Plus Extra Power Powder Jasmine (5kg)", category: "Household Cleaning", price: 540, mrp: 630, discount: 14, image: "https://rukminim2.flixcart.com/image/300/300/xif0q/washing-powder/w/v/f/-enriched-transparent-original-imag99g8azaautz7.png", rating: 4.6 },
+            { id: 70, name: "Hit Mosquito Spray (400ml)", category: "Household Cleaning", price: 235, mrp: 275, discount: 15, image: "https://m.media-amazon.com/images/I/61DGwkkoBSL.jpg", rating: 4.7 },
+            { id: 71, name: "All Out Ultra Mosquito Refills (Pack of 3)", category: "Household Cleaning", price: 220, mrp: 255, discount: 14, image: "https://cdn.grofers.com/app/images/products/sliding_image/279412a.jpg?ts=1676880583", rating: 4.8 },
+            { id: 72, name: "Dettol Antiseptic Liquid Disinfectant (1L)", category: "Household Cleaning", price: 345, mrp: 395, discount: 13, image: "https://media.naheed.pk/catalog/product/cache/2f2d0cb0c5f92580479e8350be94f387/1/0/1036579-rpl-new-1.jpg", rating: 4.9 },
+            { id: 73, name: "Gala Super Scrub Sponge Pad (Pack of 3)", category: "Household Cleaning", price: 55, mrp: 65, discount: 15, image: "https://www.bbassets.com/media/uploads/groot/images/2072022-330f051a-5.jpg", rating: 4.5 },
+            { id: 74, name: "Good Knight Gold Flash Liquid Combo", category: "Household Cleaning", price: 125, mrp: 145, discount: 14, image: "https://www.bbassets.com/media/uploads/p/l/40190048-8_1-good-knight-gold-flash-mosquito-repellent-liquid-combo.jpg", rating: 4.7 },
+            { id: 75, name: "Exo Touch & Shine Dishwash Bar (Pack of 4)", category: "Household Cleaning", price: 65, mrp: 75, discount: 13, image: "https://m.media-amazon.com/images/I/61RWp65UqtL.jpg", rating: 4.6 },
+            { id: 76, name: "Rin Advanced Detergent Bar (250g Pack of 4)", category: "Household Cleaning", price: 85, mrp: 100, discount: 15, image: "https://m.media-amazon.com/images/I/71VAypcc7WL.jpg", rating: 4.7 },
+            { id: 77, name: "Odonil Room Air Freshener Gel (75g)", category: "Household Cleaning", price: 68, mrp: 80, discount: 15, image: "https://m.media-amazon.com/images/I/61yAouZFnjL.jpg", rating: 4.6 },
+            { id: 78, name: "Domex Fresh Guard Toilet Cleaner (750ml)", category: "Household Cleaning", price: 135, mrp: 160, discount: 16, image: "https://5.imimg.com/data5/SELLER/Default/2021/1/SK/SY/YG/26549812/domex-fresh-guard-ocean-fresh-disinfectant-toilet-cleaner-750-ml-1000x1000.jpg", rating: 4.7 },
+            { id: 79, name: "Gala Twin Bucket Spin Mop Set", category: "Household Cleaning", price: 1150, mrp: 1499, discount: 23, image: "https://www.bbassets.com/media/uploads/p/xxl/40017954_11-gala-quick-spin-mop.jpg", rating: 4.8 },
+            { id: 80, name: "Godrej aer Pocket Bathroom Fragrance (Pack of 3)", category: "Household Cleaning", price: 165, mrp: 195, discount: 15, image: "https://m.media-amazon.com/images/I/71u5YgvkK6L._SL1500_.jpg", rating: 4.7 }
+        ];
+
+        let selectedCategory = "All";
+
+        // Navigation Switcher
+        function showPage(pageId) {
+            document.querySelectorAll('.page-view').forEach(page => page.classList.add('hidden'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.remove('hidden');
+
+            ['home', 'categories', 'products', 'about', 'contact'].forEach(id => {
+                const navBtn = document.getElementById(`nav-${id}`);
+                if (navBtn) {
+                    if (id === pageId) {
+                        navBtn.classList.add('text-emerald-600', 'border-emerald-600');
+                        navBtn.classList.remove('text-slate-600', 'border-transparent');
+                    } else {
+                        navBtn.classList.remove('text-emerald-600', 'border-emerald-600');
+                        navBtn.classList.add('text-slate-600', 'border-transparent');
+                    }
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileNav() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function filterCategoryAndOpen(categoryName) {
+            selectedCategory = categoryName;
+            renderCategoryPills();
+            filterProductsCatalog();
+            showPage('products');
+        }
+
+        function renderCategoryPills() {
+            const container = document.getElementById('category-pills');
+            if (!container) return;
+            const categories = ["All", "Groceries & Staples", "Snacks & Beverages", "Personal Care & Hygiene", "Household Cleaning"];
+            container.innerHTML = categories.map(cat => `
+                <button onclick="selectCategoryPill('${cat}')" 
+                        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                            cat === selectedCategory 
+                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' 
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                        }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function selectCategoryPill(cat) {
+            selectedCategory = cat;
+            renderCategoryPills();
+            filterProductsCatalog();
+        }
+
+        function handlePageSearch() {
+            filterProductsCatalog();
+        }
+
+        function filterProductsCatalog() {
+            const searchInput = document.getElementById('page-search-input');
+            const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+            let filtered = products;
+            if (selectedCategory !== "All") {
+                filtered = filtered.filter(p => p.category === selectedCategory);
+            }
+            if (query !== '') {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+            }
+            renderProducts(filtered);
+        }
+
+        // Render Product Cards Grid
+        function renderProducts(items) {
+            const grid = document.getElementById('products-grid');
+            const noResults = document.getElementById('no-results');
+            if (!grid) return;
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                if (noResults) noResults.classList.remove('hidden');
+                return;
+            }
+
+            if (noResults) noResults.classList.add('hidden');
+
+            grid.innerHTML = items.map(item => `
+                <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm card-hover-lift flex flex-col justify-between group">
+                    <div class="cursor-pointer" onclick="openProductModal(${item.id})">
+                        <div class="relative w-full h-48 bg-slate-50 rounded-2xl overflow-hidden mb-4">
+                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src=fallbackImg;" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-700 shadow-sm">
+                                ${item.category}
+                            </span>
+                            ${item.discount > 0 ? `<span class="absolute top-3 right-3 bg-rose-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm">${item.discount}% OFF</span>` : ''}
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base leading-snug line-clamp-2 mb-2 group-hover:text-emerald-600 transition-colors">
+                            ${item.name}
+                        </h3>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between mt-2">
+                        <div>
+                            <div class="flex items-baseline space-x-1.5">
+                                <span class="text-lg font-black text-emerald-600">₹${item.price}</span>
+                                <span class="text-xs text-slate-400 line-through">₹${item.mrp}</span>
+                            </div>
+                            <span class="inline-flex items-center text-amber-500 font-bold text-[11px]">
+                                <i class="fa-solid fa-star text-[10px] mr-1"></i> ${item.rating}
+                            </span>
+                        </div>
+                        <button onclick="addToCart(${item.id})" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-all active:scale-95 flex items-center space-x-1">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>Add</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart Drawer Logic
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('cart-drawer-overlay');
+            if (drawer && overlay) {
+                drawer.classList.toggle('translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartUI();
+            showToast(`${product.name} added to cart!`);
+        }
+
+        function updateCartQuantity(productId, delta) {
+            const existing = cart.find(item => item.id === productId);
+            if (!existing) return;
+            existing.quantity += delta;
+            if (existing.quantity <= 0) {
+                cart = cart.filter(item => item.id !== productId);
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+            const grandTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+            const badge = document.getElementById('nav-cart-badge');
+            if (badge) {
+                badge.textContent = totalItems;
+                badge.classList.toggle('scale-0', totalItems === 0);
+            }
+
+            const countEl = document.getElementById('cart-drawer-item-count');
+            if (countEl) countEl.textContent = `${totalItems} items selected`;
+
+            const container = document.getElementById('cart-items-container');
+            const emptyState = document.getElementById('cart-empty-state');
+            const footer = document.getElementById('cart-footer');
+
+            if (cart.length === 0) {
+                if (container) container.innerHTML = '';
+                if (emptyState) emptyState.classList.remove('hidden');
+                if (footer) footer.classList.add('hidden');
+            } else {
+                if (emptyState) emptyState.classList.add('hidden');
+                if (footer) footer.classList.remove('hidden');
+
+                if (container) {
+                    container.innerHTML = cart.map(item => `
+                        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-2xl">
+                            <div class="flex items-center space-x-3">
+                                <img src="${item.image}" onerror="this.onerror=null;this.src=fallbackImg;" class="w-12 h-12 rounded-xl object-cover">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800 line-clamp-1">${item.name}</h4>
+                                    <span class="text-xs font-black text-emerald-600">₹${item.price}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center border border-slate-200 rounded-lg bg-white">
+                                <button onclick="updateCartQuantity(${item.id}, -1)" class="px-2.5 py-1 text-slate-600 font-bold hover:bg-slate-100 rounded-l-lg text-xs">-</button>
+                                <span class="px-3 py-1 font-bold text-xs">${item.quantity}</span>
+                                <button onclick="updateCartQuantity(${item.id}, 1)" class="px-2.5 py-1 text-slate-600 font-bold hover:bg-slate-100 rounded-r-lg text-xs">+</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                const totalEl = document.getElementById('cart-grand-total');
+                if (totalEl) totalEl.textContent = `₹${grandTotal}`;
+            }
+        }
+
+        // Checkout & UPI Modal Flow
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showToast("Your cart is empty!");
+                return;
+            }
+            toggleCartDrawer();
+            const modal = document.getElementById('checkout-modal');
+            if (modal) modal.classList.remove('hidden');
+            handlePaymentMethodChange();
+        }
+
+        function closeCheckoutModal() {
+            const modal = document.getElementById('checkout-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function toggleAddressField() {
+            const fulfillment = document.getElementById('cust-fulfillment').value;
+            const addrContainer = document.getElementById('address-container');
+            const addrInput = document.getElementById('cust-address');
+
+            if (fulfillment === 'Store Pickup') {
+                addrContainer.classList.add('hidden');
+                addrInput.removeAttribute('required');
+            } else {
+                addrContainer.classList.remove('hidden');
+                addrInput.setAttribute('required', 'required');
+            }
+        }
+
+        function handlePaymentMethodChange() {
+            const payMethod = document.querySelector('input[name="payMethod"]:checked').value;
+            const upiBox = document.getElementById('upi-payment-box');
+            const grandTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+            if (payMethod === 'UPI') {
+                upiBox.classList.remove('hidden');
+                document.getElementById('cust-utr').setAttribute('required', 'required');
+                document.getElementById('upi-payable-amount').textContent = `₹${grandTotal}`;
+
+                const upiVpa = "6355059308@okbizaxis";
+                const upiName = "Radhika Super Mart";
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${upiVpa}&pn=${encodeURIComponent(upiName)}&am=${grandTotal}&cu=INR`)}`;
+                
+                document.getElementById('upi-qr-image').src = qrUrl;
+                document.getElementById('direct-upi-btn').href = `upi://pay?pa=${upiVpa}&pn=${encodeURIComponent(upiName)}&am=${grandTotal}&cu=INR`;
+            } else {
+                upiBox.classList.add('hidden');
+                document.getElementById('cust-utr').removeAttribute('required');
+            }
+        }
+
+        function processOrderAndWhatsApp(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const fulfillment = document.getElementById('cust-fulfillment').value;
+            const address = document.getElementById('cust-address').value.trim();
+            const payMethod = document.querySelector('input[name="payMethod"]:checked').value;
+            const utr = document.getElementById('cust-utr').value.trim();
+
+            if (payMethod === 'UPI' && utr.length < 6) {
+                alert("Please enter a valid UPI UTR / Ref Transaction Number.");
+                return;
+            }
+
+            const grandTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+            let message = `🛒 *NEW ORDER - RADHIKA SUPER MART*\n`;
+            message += `---------------------------------\n`;
+            message += `👤 *Customer:* ${name}\n`;
+            message += `📞 *Phone:* ${phone}\n`;
+            message += `🚚 *Option:* ${fulfillment}\n`;
+            if (fulfillment === 'Home Delivery') {
+                message += `📍 *Address:* ${address}\n`;
+            }
+            message += `💳 *Payment Method:* ${payMethod}\n`;
+            if (payMethod === 'UPI') {
+                message += `🔢 *UPI Transaction ID/UTR:* ${utr}\n`;
+            }
+            message += `---------------------------------\n`;
+            message += `📦 *ORDERED ITEMS:*\n`;
+
+            cart.forEach((item, idx) => {
+                message += `${idx + 1}. ${item.name} x ${item.quantity} = ₹${item.price * item.quantity}\n`;
+            });
+
+            message += `---------------------------------\n`;
+            message += `💰 *GRAND TOTAL: ₹${grandTotal}*\n`;
+            message += `---------------------------------\n`;
+            message += `Thank you for shopping at Radhika Super Mart!`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=916355059308&text=${encodedMessage}`;
+
+            closeCheckoutModal();
+            cart = [];
+            updateCartUI();
+
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Product Quick View Lightbox Modal Functions
+        function openProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const modal = document.getElementById('product-detail-modal');
+            modal.innerHTML = `
+                <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 relative overflow-hidden animate-in zoom-in-95 duration-200">
+                    <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center z-10 transition-colors">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                    <div class="relative w-full h-64 bg-slate-50 rounded-2xl overflow-hidden mb-5">
+                        <img src="${product.image}" alt="${product.name}" onerror="this.onerror=null;this.src=fallbackImg;" class="w-full h-full object-cover">
+                        <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 shadow-sm">
+                            ${product.category}
+                        </span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="inline-flex items-center text-amber-500 text-sm font-bold bg-amber-50 px-2.5 py-1 rounded-lg">
+                                <i class="fa-solid fa-star text-xs mr-1"></i> ${product.rating} Rating
+                            </span>
+                            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">In Stock</span>
+                        </div>
+                        <h2 class="text-xl font-black text-slate-900 leading-snug">${product.name}</h2>
+                        <div class="flex items-baseline space-x-3 pt-1">
+                            <span class="text-2xl font-black text-emerald-600">₹${product.price}</span>
+                            <span class="text-sm font-medium text-slate-400 line-through">₹${product.mrp}</span>
+                            <span class="text-xs font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md">${product.discount}% OFF</span>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed pt-2 border-t border-slate-100">
+                            Available for fast home delivery or store pickup at Radhika Super Mart, Kamrej. Guaranteed 100% fresh & authentic product.
+                        </p>
+                        <div class="flex items-center justify-between pt-4 space-x-3">
+                            <div class="flex items-center border border-slate-200 rounded-xl bg-slate-50">
+                                <button onclick="changeModalQty(-1)" class="px-3 py-2 text-slate-600 font-bold hover:bg-slate-200 rounded-l-xl transition-colors">-</button>
+                                <span id="modal-product-qty" class="px-4 py-2 font-extrabold text-slate-800 text-sm">1</span>
+                                <button onclick="changeModalQty(1)" class="px-3 py-2 text-slate-600 font-bold hover:bg-slate-200 rounded-r-xl transition-colors">+</button>
+                            </div>
+                            <button onclick="addToCartFromModal(${product.id})" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center space-x-2 text-sm">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>Add to Cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        let modalQty = 1;
+        function changeModalQty(delta) {
+            modalQty = Math.max(1, modalQty + delta);
+            const qtyEl = document.getElementById('modal-product-qty');
+            if (qtyEl) qtyEl.textContent = modalQty;
+        }
+
+        function addToCartFromModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.quantity += modalQty;
+            } else {
+                cart.push({ ...product, quantity: modalQty });
+            }
+
+            modalQty = 1;
+            closeProductModal();
+            updateCartUI();
+            showToast(`${product.name} added to cart!`);
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('product-detail-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // Search Modal Functions
+        function openSearchModal() {
+            const modal = document.getElementById('search-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.getElementById('modal-search-input').focus();
+            }
+        }
+
+        function closeSearchModal() {
+            const modal = document.getElementById('search-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleModalSearch() {
+            const query = document.getElementById('modal-search-input').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('modal-search-results');
+            if (!resultsContainer) return;
+
+            if (query === '') {
+                resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Start typing to search 80 store products...</p>`;
+                return;
+            }
+
+            const matched = products.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+
+            if (matched.length === 0) {
+                resultsContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No matching products found.</p>`;
+                return;
+            }
+
+            resultsContainer.innerHTML = matched.map(item => `
+                <div class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 border border-slate-100 transition-colors">
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="closeSearchModal(); openProductModal(${item.id})">
+                        <img src="${item.image}" onerror="this.onerror=null;this.src=fallbackImg;" class="w-12 h-12 rounded-xl object-cover">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 line-clamp-1">${item.name}</h4>
+                            <p class="text-xs text-slate-400">${item.category} • <span class="font-bold text-emerald-600">₹${item.price}</span></p>
+                        </div>
+                    </div>
+                    <button onclick="addToCart(${item.id})" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors">
+                        + Add
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Toast Feedback Alert
+        function showToast(message) {
+            const toast = document.getElementById('toast-notification');
+            const msgEl = document.getElementById('toast-message');
+            if (!toast || !msgEl) return;
+
+            msgEl.textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Contact Inquiry Form Handler
+        function handleInquirySubmit(event) {
+            event.preventDefault();
+            const messageBox = document.getElementById('inquirySuccessMsg');
+            if (messageBox) {
+                messageBox.classList.remove('hidden');
+                event.target.reset();
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 4000);
+            }
+        }
+
+        // Initial App Load Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCategoryPills();
+            renderProducts(products);
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
